@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>RANSAC</title>
+        <link rel="stylesheet" type="text/css" href="design.css">
+
+    </head>
+    <body onload = "init()">
+
+        <div class="top">
+
+            <p class="heading" id="lang_area"><img src="pics/germany.png" alt="Deutsch" onclick="showGerman()"><img src="pics/united_kingdom_great_britain.png" alt="English" onclick="showEnglish()"></p>
+            <h1 class="heading">RANSAC</h1> 
+            <div class="clear"></div>
+            <p class="prolog" lang="en">Usage info: Draw some figures below on the canvas and experiment what the algorithms detect! You can choose with the radio buttons whether you want to detect lines
+            or circles and if this should be done complete or stepwise. Furthermore can you adjust the epsilon-neighborhood in which points are considered as inlying and the amount of loops which should run (only works for complete runs!). And
+            last but not least you can choose just to take every 20th point to speed things up. For further information to the algorithms, please read the text below the interaction area.</p>
+            <p class="prolog" lang="de">Benutzungshinweise: Male ein paar Figuren auf die Leinwand unten und experimentiere was die Algorithmen entdecken! Du kannst über die Radio-Buttons auswählen, ob
+            du nach Kreisen oder Geraden suchen möchtest und ob dies schrittweise oder komplett geschehen soll. Desweiteren kannst du mit dem Regler die Epsilon Umgebung verändern in welcher Punkte dem Kreis 
+            oder der Gerade als zugehörig betrachtet werden und über das Eingabefeld die Anzahl der Durchläufe bestimmen die der Algorithmus durchlaufen soll (funktioniert nur beim kompletten Durchlauf).
+            Zuletzt kannst du noch bestimmen, ob du eine hochgerechnete Datenmenge nehmen möchtest, also nur jeden 20. Punkt, damit die Berechnung schneller erfolgt.Für weitere Informationen zu den
+            Algorithmen lies bitte den Text unter dem interaktiven Teil der Seite.</p>
+
+            <div class="in">
+                <div class="canvasArea" >
+                    <canvas id="Background" style="border: 2px solid #c3c3c3;" height="400" width="600">
+                        Your browser does not support the HTML5 canvas tag.
+                    </canvas>
+                    <canvas id="Result" style="border: 2px solid #c3c3c3;" height="400" width="600"></canvas>
+                    <canvas id="CurrentRun" style="border: 2px solid #c3c3c3;" height="400" width="600"></canvas>
+                    <canvas id="Epsilon" style="border: 2px solid #c3c3c3;" height="400" width="600"></canvas>
+                </div>
+
+
+
+            </div>
+            <div class="control_Area">
+                <fieldset>
+                    <form autocomplete="off">
+                        <input type="radio" id="circle" name="selectAlg">
+                        <label for="circle" lang="de">Kreis</label>
+                        <label for="circle" lang="en">circle</label>
+                        <input type="radio" id="line" name="selectAlg" checked>
+                        <label for="line" lang="de">Gerade</label>
+                        <label for="line" lang="en">line</label>
+                    </form>
+
+                    <form autocomplete="off">
+                        <input type="radio" id="STEPWISE" name="pace">
+                        <label for="circle" lang="de">schrittweise</label>
+                        <label for="circle" lang="en">stepwise</label>
+                        <input type="radio" id="complete" name="pace" checked>
+                        <label for="line" lang="de">komplett</label>
+                        <label for="line" lang="en">complete</label>
+                    </form>
+
+                    <p id="epsilonText_de" lang="de">Epsilon-Umgebung</p>
+                    <p id="epsilonText_en" lang="en">epsilon-neighborhood</p>
+                    <input type="range" name="epsilon_range" id="epsilon_range" min="1" max="50" value="10" onchange="amount.value = epsilon_range.value">
+                    <output name="amount" for="rangeInput" id="amount">10</output>
+                    <div class="clear"></div>
+
+                    <input type="number" name="runs" id="runs" min="1" max="200" value="25">
+                    <label for="runs" id="runsText_en" lang="en">loops</label>
+                    <label for="runs" id="runsText_de" lang="de">Durchläufe</label>
+                    <div class="clear"></div>
+
+                    <input type="checkbox" id="extrapolation" name="extrapolation">
+                    <label for="extrapolation" id="extraText_de" lang="de">Hochrechnung nutzen</label>
+                    <label for="extrapolation" id="extraText_en" lang="en">Monte Carlo approximation</label>
+
+                    <div class="clear"></div>
+                    
+                    <input type="submit" lang="de" id="go" name="go" value="Start" > 
+                    <input type="submit" lang="en" id="go" name="go" value="Go" >
+                    <input type="submit" lang="de" id="clear" value="Bild löschen" onclick="clearCanvas()">
+                    <input type="submit" lang="en" id="clear" value="Clear Canvas" onclick="clearCanvas()">
+                </fieldset>
+
+            </div>
+            <div class="watchdog">
+                <fieldset>
+                    <legend lang="en">watchdog</legend>
+                    <legend lang="de">Übersicht</legend>
+
+
+                    <p lang="en" id="actualLine_en" class="watchdog_text">actual Line:</p>
+                    <p lang="de" id="actualLine_de" class="watchdog_text">aktuelle Gerade:</p>
+                    
+                    <div class="clear"></div>
+                    <p lang="en" id="bestLine_en" class="watchdog_text">best Line:</p>
+                    <p lang="de" id="bestLine_de" class="watchdog_text">beste Gerade:</p>
+                    <input type="submit" lang="de" id="clear_best_line_de" name="clear_best_line_de" value="Zurück setzen" class="reset_buttons" >
+                    <input type="submit" lang="en" id="clear_best_line_en" name="clear_best_line_en" value="Reset" class="reset_buttons">
+<div class="clear"></div>
+                    <p lang="en" id="actualCircle_en" class="watchdog_text">actual Circle:</p>
+                    <p lang="de" id="actualCircle_de" class="watchdog_text">aktueller Kreis:</p>
+         
+                    <div class="clear"></div>
+                    <p lang="en" id="bestCircle_en" class="watchdog_text">best Circle:</p>
+                    <p lang="de" id="bestCircle_de" class="watchdog_text">bester Kreis:</p>
+                    <input type="submit" lang="de" id="clear_best_circle_de" name="clear_best_circle_de" value="Zurück setzen" class="reset_buttons">
+                    <input type="submit" lang="en" id="clear_best_circle_en" name="clear_best_circle_en" value="Reset" class="reset_buttons">
+                    <div class="clear"></div>
+                </fieldset>
+                <p lang="de" id="example_text_de">Beispiele:</p>
+                <p lang="en" id="example_text_en">Examples:</p>
+                <input type="submit"  id="example_button_1" name="example_button_1" value="1" class="example_buttons">
+                <input type="submit"  id="example_button_2" name="example_button_2" value="2" class="example_buttons">
+                <input type="submit"  id="example_button_3" name="example_button_3" value="3" class="example_buttons">
+                <div class="clear"></div>
+                
+            </div>
+            <div class="clear"></div>
+
+            <div  class="pseudocode">
+                <p id="pseudo">pseudo code:</p>
+                <div id="pseudo_line">
+                    <p class="ident0"> 
+                        line RANSAC_line(point pointset[],float epsilon,int loops){<br></p>
+                    <p class="ident1">line best_line;</p>
+                    <p class="ident1">int best_line_quality;</p>
+                    <p class="ident1" id="pseudo_for_loop_line"> for(int i=0; i < loops;i++){<br>
+                    </p>
+                   
+                    
+                    <p class="ident2 comment" lang="en">
+                        //pick two random points from data set</p>
+                    <p class="ident2 comment" lang="de">
+                        //wähle zwei zufällige Punkte aus Datenmenge</p>
+
+                    <p class="ident2" id="randomPoints1">
+                        point p=pointset[randInt(0,pointset.size())];
+                    </p>
+                    <p class="ident2" id="randomPoints2">
+                        point q=pointset[randInt(0,pointset.size())];
+                    </p>
+                    <p class="ident2 comment" lang="en">
+                        //calculate line</p>
+                    <p class="ident2 comment" lang="de">
+                        //Berechne Gerade</p>
+                    <p class="ident2" id="pseudo_calc_line">
+                        line l(p,q);
+                    </p>
+                    <p class="ident2 comment" lang="en">
+                        //evaluate epsilon neighborhood</p>
+                    <p class="ident2 comment"  lang="de">
+                        //Epsilonumgebung auswerten</p>
+                    <p class="ident2" id="pseudo_get_inliers_line">
+                        inliers=countInliers(l,epsilon);</p>
+                    <p class="ident2" id="pseudo_evaluate1">
+                        if( inliers > best_line_quality){
+                    </p>
+                    <p class="ident3" id="pseudo_evaluate2">
+                        best_line=l;
+                    </p>
+                    <p class="ident3" id="pseudo_evaluate3">
+                        best_line_quality=inliers;
+                    </p>
+                    <p class="ident2" >
+                        }
+                    </p>
+                    <p class="ident1">     
+                        }</p>
+
+
+                    <p class="ident0">
+                        }
+                    </p>
+                </div>
+                <div id="pseudo_circle">
+                <p class="ident0">
+                    circle RANSAC_circle(point pointset[],float epsilon,int loops){<br>
+                </p>
+                <p class="ident1">circle best_circle;</p>
+                    <p class="ident1">int best_circle_quality;</p>
+                    
+                <p class="ident1" id="pseudo_for_loop_circle"> for(int i=0; i < loops;i++){<br>
+                    </p>
+                    
+                    
+                    <p class="ident2 comment" lang="en">
+                        //pick three random points from data set</p>
+                    <p class="ident2 comment" lang="de">
+                        //wähle drei zufällige Punkte aus Datenmenge</p>
+
+                    <p class="ident2" id="randomPoints1">
+                        point p=pointset[randInt(0,pointset.size())];
+                    </p>
+                    <p class="ident2" id="randomPoints2">
+                        point q=pointset[randInt(0,pointset.size())];
+                    </p>
+                    <p class="ident2" id="randomPoints2">
+                        point z=pointset[randInt(0,pointset.size())];
+                    </p>
+                    <p class="ident2 comment" lang="en">
+                        //calculate circumcircle from triangle</p>
+                    <p class="ident2 comment" lang="de">
+                        //Berechne Dreieck umschreibenden Kreis</p>
+                    <p class="ident2" id="pseudo_calc_circumCirc">
+                        circle tempCircle=getCircumCircle(p,q,z);
+                    </p>
+                    <p class="ident2 comment" lang="en">
+                        //evaluate epsilon neighborhood</p>
+                    <p class="ident2 comment"  lang="de">
+                        //Epsilonumgebung auswerten</p>
+                    <p class="ident2" id="pseudo_get_inliers_circle">
+                        inliers=countInliers(tempCircle,epsilon);</p>
+                     <p class="ident2" id="pseudo_evaluate1">
+                        if( inliers > best_circle_quality){
+                    </p>
+                    <p class="ident3" id="pseudo_evaluate2">
+                        best_circle=tempCircle;
+                    </p>
+                    <p class="ident3" id="pseudo_evaluate3">
+                        best_circle_quality=inliers;
+                    </p>
+                    <p class="ident2" id="pseudo_get_inliers">
+                        }</p>
+                    
+                    
+                    <p class="ident1" id="pseudo_for_loop">}</p>
+                    
+                <p class="ident0">
+                    }
+                </p>
+                </div>
+            </div>
+
+        </div>
+        <div class="bottom">
+            <p lang="en">The random sample consensus (RANSAC) algorithm is a way to find analytically describable objects within a data set. You randomly pick your object variables (e.g. for lines
+            two points, for circles three points) as hypothesis and evaluate how good this guess is by counting all points within an epsilon neighborhood around your estimated object and
+            comparing this current guess with the best previous one. This step is repeated until a) time runs out for your problem (may only be and exit condition if necessary, is not implemented
+            here due to educational reasons) or b) your limit for hypothesis' is reached. Of course there could be other exit conditions for other tasks e.g. that a guess have to fit over a certain
+            percentage of the data set.  For this approach you've got two variables to configure the performance of the algorithm: the epsilon neighborhood and the hypothesis limit. The lower the
+            epsilon neighborhood is picked, the more accurate your guesses have to be, but if picked to small, odds are that you don't get a satisfying result after a few loops. The exact vice versa
+            can happen when you pick a big epsilon and many loops: your best result  is most likely to jump in your dataset because you count to many 'false' points as positive for your guess. In the end
+            it's pure luck if you get an useful result or not. The trick is to find an adequate ratio of iterations to epsilon neighborhood for the given problem. Above you can find an implementation
+            of the RANSAC for lines / circles written in c-styled code, for a better overview.</p>
+            <p lang ="de">Der "random sample consensus" (RANSAC) Algorithmus ist eine Möglichkeit um analytisch beschreibbare Objekte innerhalb einer Datenmenge zu finden. Als erstes wählt man seine
+            Variablen (bspw. zwei Punkte bei einer Geraden bzw. drei Punkte bei einem Kreis) zufällig aus und evaluiert diese Hypothese indem man in einer Epsilonumgebung um diese Schätzung
+            alle Punkte zählt. Diesen Wert vergleicht man daraufhin mit dem vorherig ermittelten besten Ergebnis (bzw. dem Startwert 0) und wiederholt diese Schritte bis a) das Zeitlimit erreicht ist (
+            (dies ist nur eine Abbruchbedinung, wenn die jeweilige Aufgabe es verlangt, bspw. Echtzeitberechnungen, wurde hier aus didaktischen Gründen weg gelassen) oder b) eine bestimmte Anzahl an Hypothesen
+            getestet wurden. Natürlich kann man auch weitere Abbruchbedingungen finden, jedoch kommt das dann ganz auf das Einsatzgebiet und das gesuchte Objekt an(man könnte sich bspw vorstellen abzubrechen, wenn
+            eine Schätzung einen bestimmten Prozentsatz der Daten abdeckt). Wie man nun sieht hat dieses Verfahren zwei Stellschrauben: die Epsilonumgebung und die Anzahl der zu testenden Hypothesen. Je kleiner
+            die Epsilonumgebung ist, desto genauer müssen die zufälligen Schätzungen sein, aber wählt man sie zu klein dann ist es wahrscheinlich, dass man kein zufrieden stellendes Ergebnis nach wenigen
+            Durchläufen erhält. Das genaue Gegenteil kann aber auch passieren, wenn man die Anzahl der zu testenden Schätzungen zu hoch wählt und das Epsilon groß macht: es wird zur Glückssache, ob
+            man nützliche Ergebnisse erhält, da man so viele falsch Positive Punkte zählt, dass es gut möglich ist, dass das Ergebnis in der Datenmenge hin und her springt.Die Kunst hierbei ist es also
+            ein der Aufgabe angemessenes Verhältnis zwischen Iterationen und Epsilonumgebung zu finden.Etwas weiter oben steht eine Implementierung des RANSACs für Geraden/Kreise im C-Stil.</p>
+            
+        </div>
+
+        <script src="jquery-1.11.1.min.js"></script>
+        <script type="text/javascript" src="global.js"></script>
+        <script type="text/javascript" src="toolbox.js"></script>
+        <script type="text/javascript" src="page_control.js"></script>
+        <script type="text/javascript" src="stepwiseRANSAC.js"></script>
+        <script type="text/javascript" src="ransac.js"></script>
+
+
+    </body>
+</html>

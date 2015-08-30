@@ -1,0 +1,183 @@
+
+/* 
+    Created on : 28.06.2014, 
+    Author     : Danny Behnecke
+*/
+@CHARSET "ISO-8859-1";
+
+.heading
+{
+    margin:auto;
+    padding:0;
+}
+h1.heading{
+   text-align:center;
+}
+
+#epsilonText_de,#epsilonText_en{
+    float:left;
+}
+
+#extrapolation,#extraText_de,#extraText_en{
+    white-space: nowrap;
+}
+
+#epsilon_range{
+    margin-top:15px;
+}
+#lang_area{
+    margin-top:0;
+    float:right;
+}
+
+.canvasArea{
+    position:relative;
+    margin-left:200px;
+  //  background-color:red;
+}
+
+#Background
+{
+    //width:501px;
+    //height:502px;
+    position:absolute;
+    z-index: 0;
+    left:0px;
+    top: 0px;
+}
+
+
+#CurrentRun
+{
+    //width:500px;
+    //height:500px;
+    position:absolute;
+    z-index: 1;
+    left:0px;
+    top: 0px;
+}
+
+
+#Epsilon
+{
+    //width:500px;
+    //height:500px;
+    position:absolute;
+    z-index: 2;
+    left:0px;
+    top: 0px;
+}
+
+
+#Result
+{
+    //width:500px;
+    //height:500px;
+    position:absolute;
+    z-index: 3;
+    left:0px;
+    top: 0px;
+}
+
+.clear{
+    clear:both;
+}
+
+.watchdog_text{
+    float:left;
+}
+
+.reset_buttons{
+    margin-left:50px;
+    margin-top:10px;
+}
+
+#example_text_de,#example_text_en{
+    float:left;
+}
+
+.example_buttons{
+    margin-left:20px;
+    margin-top:10px;
+}
+
+
+.control_Area{
+    position: relative;
+    margin-left:70%;
+   // background-color:orange;
+    margin-top:5%;
+}
+
+.watchdog{
+    position:relative;
+    margin-left:70%;
+    
+}
+.bottom{
+  //  background-color:cyan;
+    margin-top:5%;
+    position:relative;
+    //bottom:30px;
+    clear:both;
+}
+.in{
+  // background-color:saddlebrown; 
+    float:left;
+   // width: 65%;
+    //height: 40%;
+    //margin-left:1%;
+    margin-top:5%;
+    position:relative;
+}
+
+
+.top{
+    //background-color:yellow; 
+    height:50%;
+}
+html{
+    //height:100%;
+}
+body{
+    //height:100%;
+//    background-color:blue;
+}
+#circle{
+    float:left;
+}
+
+.ident1{
+    margin-left: 20px;
+}
+.ident2{
+    margin-left: 40px;
+}
+.ident3{
+    margin-left: 60px;
+}
+
+.pseudocode{
+    position:relative;
+    margin-top:150px;
+    font-weight: bold;
+    display:block;
+    line-height:5px;
+    padding-top: 0;
+  //  background-color:green;
+
+}
+
+div[id='pseudo_line']>p{
+    padding-top:0;
+    
+}
+
+.comment{
+    color:green;
+    font-style:italic;
+
+}
+
+
+
